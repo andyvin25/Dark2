@@ -1,0 +1,19 @@
+package com.marketplace.ProductEtalationManagement.api;
+
+import org.springframework.aot.hint.annotation.RegisterReflectionForBinding;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.PropertyNamingStrategies;
+import com.fasterxml.jackson.databind.annotation.JsonNaming;
+
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
+
+@RegisterReflectionForBinding
+@JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
+public record EtalationRequestDto(
+        @JsonProperty("etalation_name")
+        @NotBlank(message = "Fill the etalation name in the field")
+        @Size(max = 150, min = 1)
+        String etalationName) {
+}
