@@ -1,0 +1,35 @@
+name: Native Build
+
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+    branches: ["**"]
+
+jobs:
+  build-native:
+    name: Build Native Image
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup GraalVM
+        uses: graalvm/setup-graalvm@v1
+        with:
+          java-version: '25'
+          distribution: 'graalvm-community' 
+          cache: 'maven'
+
+      - name: Build Native Image
+        # This completely natively builds your environment using the installed Maven
+        run: PROFILE_STATE=prod ./mvnw clean -Pnative native:compile -Dmaven.test.skip=true
+
+      - name: List target
+        run: ls -la target/
+
+      - name: Upload native image artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: native-image
+          path: target/
