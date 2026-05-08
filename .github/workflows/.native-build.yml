@@ -23,7 +23,7 @@ jobs:
 
       - name: Build Native Image
         # This completely natively builds your environment using the installed Maven
-        run: PROFILE_STATE=prod ./mvnw clean -Pnative native:compile -Dmaven.test.skip=true
+        run: PROFILE_STATE=prod LOG_FILE_PATH=logs/app.log ./mvnw clean -Pnative native:compile -Dmaven.test.skip=true
 
       - name: List target
         run: ls -la target/
