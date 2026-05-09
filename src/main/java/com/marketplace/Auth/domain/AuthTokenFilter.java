@@ -34,7 +34,6 @@ public class AuthTokenFilter extends OncePerRequestFilter {
     @Autowired
     private JwtUtil jwtUtil;
 
-    @Lazy
     @Autowired
     private HandlerExceptionResolver handlerExceptionResolver;
 
