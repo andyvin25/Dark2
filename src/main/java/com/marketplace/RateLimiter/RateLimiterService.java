@@ -26,7 +26,6 @@ public class RateLimiterService {
 //        increment = saveData(key, INITIAL_REQUEST++);
         Long increment = stringRedisTemplate.opsForValue().increment(key);
         Assert.notNull(increment, "Increment value must not be null");
-
         if (increment == FIRST_REQUEST) {
             stringRedisTemplate.expire(key, EXPIRE_TIME);
         }
