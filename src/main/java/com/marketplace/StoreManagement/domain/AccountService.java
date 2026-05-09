@@ -96,15 +96,16 @@ public class AccountService {
                 .orElseThrow(() -> new ResourceNotFoundException("You need to create the store first"));
 
         if (store.getName().equals(storeDto.storeName())) {
-            store.setName(storeDto.storeName());
-            store.setDescription(storeDto.description());
-            saveAccount(account);
             return store.getName();
         }
 
         if (hasStoreNameSame) {
             throw new ResourceDuplicationException("The name of the store is already been taken");
         }
+
+        store.setName(storeDto.storeName());
+        store.setDescription(storeDto.description());
+        saveAccount(account);
 
         return store.getName();
     }

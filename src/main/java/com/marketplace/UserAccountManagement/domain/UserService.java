@@ -57,16 +57,15 @@ public class UserService {
                         .orElseThrow(() -> new ResourceNotFoundException("There is no user with this id " + id));
 
         if (foundUser.getEmail().equals(accountDto.email())) {
-            foundUser.setEmail(accountDto.email());
-            foundUser.setName(accountDto.name());
-            sellerRepository.save(foundUser);
             return foundUser;
-
         }
 
         if (isEmailDuplicate(accountDto.email())) {
             throw new ResourceDuplicationException("The email has been taken");
         }
+        foundUser.setEmail(accountDto.email());
+        foundUser.setName(accountDto.name());
+        sellerRepository.save(foundUser);
 
         return foundUser;
     }

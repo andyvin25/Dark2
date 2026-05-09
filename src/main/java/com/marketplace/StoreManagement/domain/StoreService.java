@@ -89,7 +89,6 @@ public class StoreService {
         Profile profile = store.getStoreProfile();
 
         String imagePath = gcsService.uploadProfile(compressedByte, storeIdImageDirectory, imageNameGenerated);
-        System.out.println("imagePath = " + imagePath);
         profile.setLogoPath(imagePath);
         profile.setFilename(imageNameGenerated);
         saveStore(store);

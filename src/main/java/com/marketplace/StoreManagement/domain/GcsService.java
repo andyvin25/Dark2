@@ -1,9 +1,9 @@
 package com.marketplace.StoreManagement.domain;
 
 import com.google.cloud.storage.*;
-import com.marketplace.Config.BucketConfig;
 import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -12,9 +12,8 @@ import java.io.IOException;
 public class GcsService {
     private Storage storage;
 
-//    @Value("${gcs.bucket-name}")
-    @Autowired
-    private BucketConfig bucketConfig;
+    @Value("${gcs.bucket-name}")
+    private String bucketName;
 
     @PostConstruct
     public void initStorage() {
@@ -47,7 +46,7 @@ public class GcsService {
     public String uploadProfile(byte[] file, String storeId, String fileOriginalName) throws IOException {
         String blobPath = buildBlobPath(storeId, fileOriginalName);
         Blob blob = storage.create(
-                BlobInfo.newBuilder(bucketConfig.getBucketName(), blobPath).build(),
+                BlobInfo.newBuilder(bucketName, blobPath).build(),
                 file
         );
         return blob.getMediaLink();
@@ -56,7 +55,7 @@ public class GcsService {
     public void deleteFile(String storeId, String fileOriginalName) {
         String blobPath = buildBlobPath(storeId, fileOriginalName);
 
-        BlobId blobId = BlobId.of(bucketConfig.getBucketName(), blobPath);
+        BlobId blobId = BlobId.of(bucketName, blobPath);
         storage.delete(blobId);
     }
 
