@@ -74,21 +74,20 @@ public class AuthTokenFilter extends OncePerRequestFilter {
                     SecurityContextHolder.getContext().setAuthentication(authToken);
                 }
             }
-
             filterChain.doFilter(request, response);
         } catch (Exception exception) {
-        if (exception instanceof ResponseStatusException rse) {
-            writeErrorResponse(response, rse.getStatusCode().value(), rse.getReason());
-        } else if (exception instanceof ExpiredJwtException) {
-            log.error("JWT expired: {}", exception.getMessage());
-            writeErrorResponse(response, HttpStatus.UNAUTHORIZED.value(), "Your session has expired. Please log in again.");
-        } else if (exception instanceof SignatureException
-                || exception instanceof MalformedJwtException
-                || exception instanceof UnsupportedJwtException) {
-            log.error("JWT error: {}", exception.getMessage());
-            writeErrorResponse(response, HttpStatus.UNAUTHORIZED.value(), "Invalid token. Please log in again.");
+            if (exception instanceof ResponseStatusException rse) {
+                writeErrorResponse(response, rse.getStatusCode().value(), rse.getReason());
+            } else if (exception instanceof ExpiredJwtException) {
+                log.error("JWT expired: {}", exception.getMessage());
+                writeErrorResponse(response, HttpStatus.UNAUTHORIZED.value(), "Your session has expired. Please log in again.");
+            } else if (exception instanceof SignatureException
+                    || exception instanceof MalformedJwtException
+                    || exception instanceof UnsupportedJwtException) {
+                log.error("JWT error: {}", exception.getMessage());
+                writeErrorResponse(response, HttpStatus.UNAUTHORIZED.value(), "Invalid token. Please log in again.");
+            }
         }
-    }
     }
 
     private void writeErrorResponse(HttpServletResponse response, int status, String message) throws IOException {

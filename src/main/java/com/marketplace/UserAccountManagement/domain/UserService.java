@@ -52,12 +52,12 @@ public class UserService {
         return count > 0;
     }
 
-    public User updateUser(String id, UserAccountUpdateDTO accountDto) {
+    public void updateUser(String id, UserAccountUpdateDTO accountDto) {
         User foundUser = sellerRepository.findActiveById(id)
                         .orElseThrow(() -> new ResourceNotFoundException("There is no user with this id " + id));
 
         if (foundUser.getEmail().equals(accountDto.email())) {
-            return foundUser;
+            return;
         }
 
         if (isEmailDuplicate(accountDto.email())) {
@@ -67,7 +67,6 @@ public class UserService {
         foundUser.setName(accountDto.name());
         sellerRepository.save(foundUser);
 
-        return foundUser;
     }
 
     public void updateUserPassword(User foundUser, UserAccountUpdatePasswordDTO accountDto) {
