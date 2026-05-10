@@ -141,6 +141,7 @@ public class StoreService {
 
     private byte[] compressImage(MultipartFile file, String imageName) throws IOException {
         System.out.println("before read input image");
+        System.out.println("file.getInputStream() = " + file.getInputStream());
         BufferedImage inputImage = ImageIO.read(file.getInputStream());
         System.out.println("inputImage = " + inputImage);
         Iterator<ImageWriter> writers = ImageIO.getImageWritersByFormatName("jpg");
