@@ -45,17 +45,20 @@ public class GcsService {
 
     public String uploadProfile(byte[] file, String storeId, String fileOriginalName) throws IOException {
         String blobPath = buildBlobPath(storeId, fileOriginalName);
+        System.out.println("blobPath = " + blobPath);
         Blob blob = storage.create(
                 BlobInfo.newBuilder(bucketName, blobPath).build(),
                 file
         );
+        System.out.println("blob = " + blob);
         return blob.getMediaLink();
     }
 
     public void deleteFile(String storeId, String fileOriginalName) {
         String blobPath = buildBlobPath(storeId, fileOriginalName);
-
+        System.out.println("blobPath = " + blobPath);
         BlobId blobId = BlobId.of(bucketName, blobPath);
+        System.out.println("blobId = " + blobId);
         storage.delete(blobId);
     }
 
