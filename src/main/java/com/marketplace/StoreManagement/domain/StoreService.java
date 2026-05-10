@@ -69,17 +69,23 @@ public class StoreService {
         if (file.getSize() > 2_000_000) {
             throw new IllegalArgumentException("File is too large. The size limit is 2 MB.");
         }
-
+        System.out.println("before generate name execute");
         String imageNameGenerated = ImageName.generateName();
+        System.out.println("after generate name");
         byte[] compressedByte = compressImage(file, imageNameGenerated);
-
+        System.out.println("compressedByte = " + compressedByte);
         if (store.getStoreProfile().getLogoPath() != null) {
+            System.out.println("before delete for update");
             gcsService.deleteFile(store.getId(), store.getStoreProfile().getFilename());
+            System.out.println("after delete image on gcs");
         }
         String storeIdImageDirectory = store.getId();
+        System.out.println("storeIdImageDirectory = " + storeIdImageDirectory);
+
         Profile profile = store.getStoreProfile();
 
         String imagePath = gcsService.uploadProfile(compressedByte, storeIdImageDirectory, imageNameGenerated);
+        System.out.println("imagePath = " + imagePath);
         profile.setLogoPath(imagePath);
         profile.setFilename(imageNameGenerated);
         saveStore(store);
@@ -134,20 +140,30 @@ public class StoreService {
     }
 
     private byte[] compressImage(MultipartFile file, String imageName) throws IOException {
+        System.out.println("before read input image");
         BufferedImage inputImage = ImageIO.read(file.getInputStream());
+        System.out.println("inputImage = " + inputImage);
         Iterator<ImageWriter> writers = ImageIO.getImageWritersByFormatName("jpg");
+        System.out.println("writers = " + writers);
         ImageWriter writer = writers.next();
+        System.out.println("writer = " + writer);
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        System.out.println("baos = " + baos);
         try (ImageOutputStream outputStream = ImageIO.createImageOutputStream(baos)) {
+            System.out.println("outputStream = " + outputStream);
             writer.setOutput(outputStream);
             ImageWriteParam params = writer.getDefaultWriteParam();
             params.setCompressionMode(ImageWriteParam.MODE_EXPLICIT);
             params.setCompressionQuality(0.2f);
+            System.out.println("params = " + params);
             writer.write(null, new IIOImage(inputImage, null, null), params);
         } finally {
+            System.out.println("before writer dispose");
             writer.dispose();
         }
+        System.out.println("baos after write = " + baos);
         byte[] compressedBytes = baos.toByteArray();
+        System.out.println("compressedBytes = " + compressedBytes);
         // Save the compressed bytes to the file specified by imageName
         Files.write(Paths.get(imageName), compressedBytes);
         return compressedBytes;
