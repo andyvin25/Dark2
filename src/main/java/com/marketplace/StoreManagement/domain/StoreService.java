@@ -14,6 +14,7 @@ import java.util.*;
 
 import javax.imageio.IIOImage;
 import javax.imageio.ImageIO;
+import javax.imageio.ImageWriteParam;
 import javax.imageio.ImageWriter;
 import javax.imageio.stream.ImageOutputStream;
 
@@ -79,13 +80,13 @@ public class StoreService {
             throw new IllegalArgumentException("File is too large. The size limit is 2 MB.");
         }
 
-        byte[] compressedByte = compressImage(file);
+        String imageNameGenerated = ImageName.generateName();
+        byte[] compressedByte = compressImage(file, imageNameGenerated);
 
         if (store.getStoreProfile().getLogoPath() != null) {
             gcsService.deleteFile(store.getId(), store.getStoreProfile().getFilename());
         }
         String storeIdImageDirectory = store.getId();
-        String imageNameGenerated = ImageName.generateName();
         Profile profile = store.getStoreProfile();
 
         String imagePath = gcsService.uploadProfile(compressedByte, storeIdImageDirectory, imageNameGenerated);
@@ -142,16 +143,23 @@ public class StoreService {
         saveStore(store);
     }
 
-    private byte[] compressImage(MultipartFile file) throws IOException {
-        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-
-        Thumbnails.of(file.getInputStream())
-                .scale(1.0)
-                .outputQuality(0.3)
-                .outputFormat("jpg")   // just define format here, unrelated to GCS filename
-                .toOutputStream(outputStream);
-
-        return outputStream.toByteArray();
+    private byte[] compressImage(MultipartFile file, String imageName) throws IOException {
+        BufferedImage inputImage = ImageIO.read(file.getInputStream());
+        Iterator<ImageWriter> writers = ImageIO.getImageWritersByFormatName("jpg");
+        ImageWriter writer = writers.next();
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        try (ImageOutputStream outputStream = ImageIO.createImageOutputStream(baos)) {
+            writer.setOutput(outputStream);
+            ImageWriteParam params = writer.getDefaultWriteParam();
+            params.setCompressionMode(ImageWriteParam.MODE_EXPLICIT);
+            params.setCompressionQuality(0.2f);
+            writer.write(null, new IIOImage(inputImage, null, null), params);
+        } finally {
+            writer.dispose();
+        }
+        byte[] compressedBytes = baos.toByteArray();
+        // Save the compressed bytes to the file specified by imageName
+        Files.write(Paths.get(imageName), compressedBytes);
+        return compressedBytes;
     }
-
 }
