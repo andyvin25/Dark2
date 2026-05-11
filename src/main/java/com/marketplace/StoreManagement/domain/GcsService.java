@@ -5,6 +5,7 @@ import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 
@@ -43,12 +44,12 @@ public class GcsService {
         return storeId + "/" + fileOriginalName + ".jpg";
     }
 
-    public String uploadProfile(byte[] file, String storeId, String fileOriginalName) throws IOException {
-        String blobPath = buildBlobPath(storeId, fileOriginalName);
+    public String uploadProfile(String storeId, String generatedName, MultipartFile file) throws IOException {
+        String blobPath = buildBlobPath(storeId, generatedName);
         System.out.println("blobPath = " + blobPath);
         Blob blob = storage.create(
                 BlobInfo.newBuilder(bucketName, blobPath).build(),
-                file
+                file.getBytes()
         );
         System.out.println("blob = " + blob);
         return blob.getMediaLink();
