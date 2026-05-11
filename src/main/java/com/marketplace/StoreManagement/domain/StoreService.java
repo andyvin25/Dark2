@@ -1,17 +1,7 @@
 package com.marketplace.StoreManagement.domain;
 
-import java.awt.image.BufferedImage;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.*;
-
-import javax.imageio.IIOImage;
-import javax.imageio.ImageIO;
-import javax.imageio.ImageWriteParam;
-import javax.imageio.ImageWriter;
-import javax.imageio.stream.ImageOutputStream;
 
 import com.marketplace.Util.ImageName;
 import lombok.extern.slf4j.Slf4j;
@@ -69,23 +59,17 @@ public class StoreService {
         if (file.getSize() > 2_000_000) {
             throw new IllegalArgumentException("File is too large. The size limit is 2 MB.");
         }
-        System.out.println("before generate name execute");
         String imageNameGenerated = ImageName.generateName();
-        System.out.println("after generate name");
 //        byte[] compressedByte = compressImage(file, imageNameGenerated);
 //        System.out.println("compressedByte = " + compressedByte);
         if (store.getStoreProfile().getLogoPath() != null) {
-            System.out.println("before delete for update");
             gcsService.deleteFile(store.getId(), store.getStoreProfile().getFilename());
-            System.out.println("after delete image on gcs");
         }
         String storeIdImageDirectory = store.getId();
-        System.out.println("storeIdImageDirectory = " + storeIdImageDirectory);
 
         Profile profile = store.getStoreProfile();
 
         String imagePath = gcsService.uploadProfile(storeIdImageDirectory, imageNameGenerated, file);
-        System.out.println("imagePath = " + imagePath);
         profile.setLogoPath(imagePath);
         profile.setFilename(imageNameGenerated);
         saveStore(store);
